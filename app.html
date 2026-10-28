@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Discrete Probability Distributions</title>
+<style>
+:root{--bg:#f7f7f5;--card:#fff;--text:#1f2328;--muted:#5f6670;--line:#dcdcd6;--accent:#2f6fdb;--bar:#5b8def;--warn:#c0392b;--mean:#d9480f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181c;--card:#20242a;--text:#e7e9ec;--muted:#9aa3ad;--line:#343a42;--accent:#7aa5ff;--bar:#5b8def;--warn:#ff8a7a;--mean:#ffa066;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#16181c;--card:#20242a;--text:#e7e9ec;--muted:#9aa3ad;--line:#343a42;--accent:#7aa5ff;--bar:#5b8def;--warn:#ff8a7a;--mean:#ffa066;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--card);border-bottom:1px solid var(--line)}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+header h1{font-size:1.15rem;margin:0;padding:14px 0 6px}
+nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px}
+nav a{padding:6px 14px;border-radius:6px;color:var(--muted);text-decoration:none;white-space:nowrap}
+nav a.on{background:var(--accent);color:#fff}
+main{padding:20px 16px 40px}
+section.page{display:none}section.page.on{display:block}
+h2{margin:.2em 0 .6em;font-size:1.35rem}
+h3{margin:1.6em 0 .5em;font-size:1.05rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.row{display:flex;flex-wrap:wrap;gap:16px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.9rem;color:var(--muted);flex:1;min-width:150px}
+input{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text);width:100%}
+input.bad{border-color:var(--warn)}
+.err{color:var(--warn);font-size:.9rem;margin:6px 0 0;min-height:1.2em}
+.sel{margin-top:12px;font-size:1.05rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.stat small{color:var(--muted);display:block}
+.stat b{font-size:1.4rem;font-variant-numeric:tabular-nums}
+.stat span{display:block;font-size:.8rem;color:var(--muted)}
+.ok{color:var(--muted);font-size:.9rem;margin-top:8px}
+.formula{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin:10px 0;overflow-x:auto;white-space:nowrap}
+.res{font-size:1.1rem;margin:8px 0}
+.res b{font-variant-numeric:tabular-nums}
+.note{color:var(--muted);font-size:.95rem;margin:4px 0}
+.chartbox{position:relative}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--muted);font-size:11px}
+svg .ax{stroke:var(--line)}
+svg .bar{fill:var(--bar)}svg .bar:hover{fill:var(--accent)}
+svg .mean{stroke:var(--mean);stroke-dasharray:5 4;stroke-width:1.5}
+.tip{position:absolute;pointer-events:none;background:var(--text);color:var(--bg);padding:5px 9px;border-radius:6px;font-size:.85rem;display:none;white-space:nowrap}
+.legend{font-size:.85rem;color:var(--muted)}
+.soon{text-align:center;padding:40px 16px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>Discrete Probability Distributions</h1>
+<nav id="nav">
+<a href="#home" data-p="home">Home</a><a href="#binomial" data-p="binomial">Binomial</a><a href="#poisson" data-p="poisson">Poisson</a><a href="#geometric" data-p="geometric">Geometric</a>
+</nav></div></header>
+
+<main class="wrap">
+<section class="page" id="home">
+<h2>Welcome</h2>
+<div class="card">
+<p>This lab explores three discrete probability distributions used throughout AI and machine learning. Each page has inputs, statistics, a PMF calculator, a CDF calculator and a PMF graph.</p>
+<p><a href="#binomial">Binomial</a> — successes in a fixed number of trials.<br>
+<a href="#poisson">Poisson</a> — number of events in a fixed interval.<br>
+<a href="#geometric">Geometric</a> — trial number of the first success.</p>
+</div>
+</section>
+<section class="page" id="binomial"></section>
+<section class="page" id="poisson"></section>
+<section class="page" id="geometric"></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const pages=['home','binomial','poisson','geometric'];
+function route(){
+  let h=(location.hash||'#home').slice(1);if(!pages.includes(h))h='home';
+  pages.forEach(p=>$(p).classList.toggle('on',p===h));
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.p===h));
+}
+addEventListener('hashchange',route);route();
+
+const lf=[0];for(let i=1;i<=10000;i++)lf[i]=lf[i-1]+Math.log(i);
+const f=(x,d=6)=>Number.isFinite(x)?x.toFixed(d):'undefined';
+const isInt=s=>/^-?\d+$/.test(s.trim());
+const isNum=s=>s.trim()!==''&&!isNaN(+s);
+const stat=(mean,variance,skew,fm,fv,fs)=>{const sd=Math.sqrt(variance);return[['Mean',fm,mean],['Variance',fv,variance],['Std. deviation','√variance',sd],['Second moment','E[X²] = Var + Mean²',variance+mean*mean],['Skewness',fs,skew]]};
+
+const D=[
+{id:'binomial',name:'Binomial',intro:'X ~ Binomial(n, p): the number of successes in n independent trials, each with success probability p.',
+ params:[{id:'n',label:'Number of trials n',def:20,step:1,ok:s=>isInt(s)&&+s>=1&&+s<=1000,msg:'n must be a positive integer (1 to 1000).'},
+         {id:'p',label:'Probability of success p',def:0.35,step:0.01,ok:s=>isNum(s)&&+s>=0&&+s<=1,msg:'p must be between 0 and 1.'}],
+ sel:P=>`X ~ Binomial(${P.n}, ${P.p})`,
+ kRange:P=>[0,P.n],kMsg:P=>`k must be an integer from 0 to ${P.n}.`,
+ pmf:(k,{n,p})=>p===0?+(k===0):p===1?+(k===n):Math.exp(lf[n]-lf[k]-lf[n-k]+k*Math.log(p)+(n-k)*Math.log(1-p)),
+ formula:'P(X=k) = C(n,k) p^k (1&minus;p)^(n&minus;k)',
+ pmfExp:(k,P)=>`This is the chance of getting exactly ${k} success${k===1?'':'es'} in ${P.n} trial${P.n===1?'':'s'}.`,
+ cdfExp:'P(X ≤ k) means the probability of getting k or fewer successes.',
+ stats:({n,p})=>{const v=n*p*(1-p);return stat(n*p,v,v>0?(1-2*p)/Math.sqrt(v):NaN,'np','np(1−p)','(1−2p)/√(np(1−p))')},
+ check:(P,st)=>P.n===20&&P.p===0.35?`Check for n = 20, p = 0.35: mean = ${f(st[0][2],2)} (expected 7), variance = ${f(st[1][2],2)} (expected 4.55) ✓`:'',
+ range:P=>[0,P.n],mean:P=>P.n*P.p,xlabel:'Number of successes X',meanLabel:'np'},
+{id:'poisson',name:'Poisson',intro:'X ~ Poisson(λ): the number of events in a fixed interval when events occur independently at an average rate λ.',
+ params:[{id:'l',label:'Average rate λ',def:4,step:0.5,ok:s=>isNum(s)&&+s>0&&+s<=500,msg:'λ must be greater than 0 (up to 500).'}],
+ sel:P=>`X ~ Poisson(${P.l})`,
+ kRange:P=>[0,10000],kMsg:P=>'k must be an integer from 0 to 10000.',
+ pmf:(k,{l})=>Math.exp(-l+k*Math.log(l)-lf[k]),
+ formula:'P(X=k) = e^(&minus;λ) λ^k / k!',
+ pmfExp:(k,P)=>`This is the chance of seeing exactly ${k} event${k===1?'':'s'} in one interval when the average is ${P.l}.`,
+ cdfExp:'P(X ≤ k) means the probability of seeing k or fewer events.',
+ stats:({l})=>stat(l,l,1/Math.sqrt(l),'λ','λ','1/√λ'),
+ check:(P,st)=>P.l===4?`Check for λ = 4: mean = ${f(st[0][2],2)} and variance = ${f(st[1][2],2)} (both equal λ) ✓`:'',
+ range:P=>[0,Math.ceil(P.l+6*Math.sqrt(P.l)+6)],mean:P=>P.l,xlabel:'Number of events X',meanLabel:'λ'},
+{id:'geometric',name:'Geometric',intro:'X ~ Geometric(p): the trial number on which the first success occurs, so X = 1, 2, 3, …',
+ params:[{id:'p',label:'Probability of success p',def:0.25,step:0.01,ok:s=>isNum(s)&&+s>0&&+s<=1,msg:'p must be greater than 0 and at most 1.'}],
+ sel:P=>`X ~ Geometric(${P.p})`,
+ kRange:P=>[1,10000],kMsg:P=>'k must be an integer from 1 to 10000.',
+ pmf:(k,{p})=>Math.pow(1-p,k-1)*p,
+ cdf:(k,{p})=>1-Math.pow(1-p,k),tail:(k,{p})=>Math.pow(1-p,k),
+ formula:'P(X=k) = (1&minus;p)^(k&minus;1) p',
+ pmfExp:(k,P)=>`This is the chance that the first success happens exactly on trial ${k}.`,
+ cdfExp:'P(X ≤ k) means the probability that the first success happens on or before trial k.',
+ stats:({p})=>{const v=(1-p)/(p*p);return stat(1/p,v,p<1?(2-p)/Math.sqrt(1-p):NaN,'1/p','(1−p)/p²','(2−p)/√(1−p)')},
+ check:(P,st)=>P.p===0.25?`Check for p = 0.25: mean = ${f(st[0][2],2)} (1/p = 4), variance = ${f(st[1][2],2)} (expected 12) ✓`:'',
+ range:P=>[1,P.p>=1?10:Math.min(100,Math.max(10,Math.ceil(Math.log(0.001)/Math.log(1-P.p))))],mean:P=>1/P.p,xlabel:'Trial number of first success X',meanLabel:'1/p',note:'The graph shows the first values of X where the probability is non-negligible (at most X = 100).'}
+];
+
+function setup(c){
+  const sec=$(c.id),q=r=>sec.querySelector(`[data-r="${r}"]`);
+  const kin=(r,e,d)=>`<label style="max-width:220px">Value of k<input data-r="${r}" type="number" step="1" value="${d}"></label><div class="err" data-r="${e}"></div>`;
+  const k0=c.id==='geometric'?4:(c.id==='poisson'?4:7);
+  sec.innerHTML=`<h2>${c.name} Distribution</h2><p class="note">${c.intro}</p>
+<div class="card"><div class="row">${c.params.map(a=>`<label>${a.label}<input data-r="${a.id}" type="number" step="${a.step}" value="${a.def}"></label>`).join('')}</div>
+<div class="err" data-r="err"></div><div class="sel" data-r="sel"></div></div>
+<div data-r="out"><h3>Statistics</h3><div class="stats" data-r="stats"></div><div class="ok" data-r="check"></div>
+<h3>PMF calculator</h3><div class="card">${kin('kp','errp',k0)}<div class="formula">${c.formula}</div><div class="res" data-r="pmfres"></div><div class="note" data-r="pmfexp"></div></div>
+<h3>CDF calculator</h3><div class="card">${kin('kc','errc',k0)}<div class="res" data-r="cdfres"></div><div class="note">${c.cdfExp}</div></div>
+<h3>PMF graph</h3><div class="card"><div class="chartbox" data-r="box"><svg data-r="chart" viewBox="0 0 640 320" role="img" aria-label="${c.name} PMF bar chart"></svg><div class="tip" data-r="tip"></div></div>
+<div class="legend">Dashed line = mean (${c.meanLabel}). ${c.note||''}</div></div></div>`;
+  const checkK=(r,e,P)=>{const el=q(r),[lo,hi]=c.kRange(P),s=el.value;const ok=isInt(s)&&+s>=lo&&+s<=hi;
+    el.classList.toggle('bad',!ok);q(e).textContent=ok?'':c.kMsg(P);return ok?+s:null};
+  function render(){
+    const P={},msgs=[];
+    c.params.forEach(a=>{const el=q(a.id),ok=el.value.trim()!==''&&a.ok(el.value);el.classList.toggle('bad',!ok);if(!ok)msgs.push(a.msg);P[a.id]=+el.value});
+    q('err').textContent=msgs.join(' ');
+    if(msgs.length){q('out').style.display='none';q('sel').textContent='';return}
+    q('out').style.display='block';
+    q('sel').innerHTML=`Selected: ${c.params.map(a=>`<b>${a.id==='l'?'λ':a.id} = ${P[a.id]}</b>`).join(', ')} &nbsp;→&nbsp; ${c.sel(P)}`;
+    const st=c.stats(P);
+    q('stats').innerHTML=st.map(([a,b,v])=>`<div class="stat"><small>${a}</small><b>${f(v,4)}</b><span>${b}</span></div>`).join('');
+    q('check').textContent=c.check(P,st);
+    const kp=checkK('kp','errp',P);
+    if(kp===null){q('pmfres').textContent='';q('pmfexp').textContent=''}
+    else{const v=c.pmf(kp,P);q('pmfres').innerHTML=`P(X = ${kp}) = <b>${f(v)}</b> (${f(v*100,3)}%)`;q('pmfexp').textContent=c.pmfExp(kp,P)}
+    const kc=checkK('kc','errc',P);
+    if(kc===null)q('cdfres').textContent='';
+    else{let cd,tl;
+      if(c.cdf){cd=c.cdf(kc,P);tl=c.tail(kc,P)}
+      else{cd=0;for(let i=0;i<=kc;i++)cd+=c.pmf(i,P);cd=Math.min(1,cd);tl=1-cd}
+      q('cdfres').innerHTML=`P(X ≤ ${kc}) = <b>${f(cd)}</b><br>P(X &gt; ${kc}) = 1 − P(X ≤ ${kc}) = <b>${f(tl)}</b>`}
+    draw(P);
+  }
+  function draw(P){
+    const [lo,hi]=c.range(P),N=hi-lo+1,W=640,H=320,ml=52,mr=14,mt=14,mb=48,iw=W-ml-mr,ih=H-mt-mb;
+    const vals=[];for(let k=lo;k<=hi;k++)vals.push(c.pmf(k,P));
+    const raw=Math.max(...vals)*1.1,step=[0.01,0.02,0.05,0.1,0.2,0.25,0.5,1].find(s=>raw/s<=6)||1,ymax=Math.ceil(raw/step)*step;
+    const bw=iw/N,gap=bw>6?1.5:0,y=v=>mt+ih-(v/ymax)*ih;
+    let s=`<line class="ax" x1="${ml}" y1="${mt+ih}" x2="${W-mr}" y2="${mt+ih}"/><line class="ax" x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ih}"/>`;
+    for(let v=0;v<=ymax+1e-9;v+=step)s+=`<line class="ax" x1="${ml}" y1="${y(v)}" x2="${W-mr}" y2="${y(v)}" opacity=".5"/><text x="${ml-6}" y="${y(v)+4}" text-anchor="end">${v.toFixed(step<0.1?2:1)}</text>`;
+    vals.forEach((v,i)=>{const h=(v/ymax)*ih;s+=`<rect class="bar" data-k="${lo+i}" x="${ml+i*bw+gap/2}" y="${mt+ih-h}" width="${Math.max(bw-gap,0.5)}" height="${h}"/>`});
+    const ts=Math.ceil(N/12);
+    for(let k=lo;k<=hi;k+=ts)s+=`<text x="${ml+(k-lo+0.5)*bw}" y="${mt+ih+16}" text-anchor="middle">${k}</text>`;
+    const m=c.mean(P);
+    if(m>=lo-0.5&&m<=hi+0.5){const mx=ml+(m-lo+0.5)*bw;s+=`<line class="mean" x1="${mx}" y1="${mt}" x2="${mx}" y2="${mt+ih}"/>`}
+    s+=`<text x="${ml+iw/2}" y="${H-8}" text-anchor="middle">${c.xlabel}</text><text transform="translate(13 ${mt+ih/2}) rotate(-90)" text-anchor="middle">Probability P(X)</text>`;
+    const svg=q('chart');svg.innerHTML=s;svg._v=vals;svg._lo=lo;
+  }
+  const svg=q('chart'),tip=q('tip'),box=q('box');
+  svg.addEventListener('mousemove',e=>{
+    const r=e.target.closest('rect.bar');if(!r){tip.style.display='none';return}
+    const k=+r.dataset.k,v=svg._v[k-svg._lo];
+    tip.innerHTML=`X = ${k}<br>P(X=${k}) = ${v.toFixed(6)}`;tip.style.display='block';
+    const b=box.getBoundingClientRect();let x=e.clientX-b.left+12;if(x>b.width-150)x-=160;
+    tip.style.left=x+'px';tip.style.top=Math.max(0,e.clientY-b.top-44)+'px'});
+  svg.addEventListener('mouseleave',()=>tip.style.display='none');
+  sec.querySelectorAll('input').forEach(i=>i.addEventListener('input',render));
+  render();
+}
+D.forEach(setup);
+</script>
+</body>
+</html>
