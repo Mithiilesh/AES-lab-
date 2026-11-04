@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Continuous Probability Distributions: Industry Applications</title>
+<style>
+:root{--bg:#05080f;--surface:#0b121d;--text:#e6faff;--muted:#7fa3b3;--border:#12334a;--accent:#00e5ff;--accent-soft:#062c3a;--warn:#3a3118;--warn-text:#f2d680;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+
+
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--surface);z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--surface);border-bottom:1px solid var(--border);z-index:5}
+.bar{max-width:1000px;margin:auto;padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.brand{font-weight:700;color:var(--text);text-decoration:none}
+nav{display:flex;flex-wrap:wrap;gap:6px}
+nav a{padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted);font-size:.92rem}
+nav a:hover{background:var(--accent-soft)}
+nav a.on{background:var(--accent);color:var(--bg);font-weight:600}
+main{max-width:1000px;margin:auto;padding:24px 16px 56px}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.2;margin:0 0 8px}
+h2{font-size:1.15rem;margin:0 0 10px}
+.lead{color:var(--muted);max-width:62ch}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:24px}
+.card,.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.card{text-decoration:none;color:inherit;display:block;transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 10px;border-radius:999px;margin-bottom:8px}
+.card p{color:var(--muted);margin:6px 0 0;font-size:.95rem}
+.layout{display:grid;gap:16px;margin-top:20px}
+@media(min-width:820px){.layout{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}}
+.field{margin-bottom:14px}
+.field label{display:flex;justify-content:space-between;font-size:.9rem;font-weight:600;margin-bottom:4px}
+.field label span{color:var(--accent);font-variant-numeric:tabular-nums}
+.field small{color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.formula{background:var(--accent-soft);border-radius:10px;padding:14px;font-family:Georgia,"Times New Roman",serif;font-size:1.1rem;overflow-x:auto;white-space:nowrap}
+.formula+p,.panel p{margin:10px 0 0;color:var(--muted);font-size:.95rem}
+button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:9px 18px;background:var(--accent);color:var(--bg);cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.soon{background:var(--warn);color:var(--warn-text);border-radius:10px;padding:8px 12px;font-size:.88rem;margin-top:12px}
+.result{margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.st{background:var(--accent-soft);border-radius:10px;padding:8px 12px}
+.st span{display:block;font-size:.78rem;color:var(--muted)}
+.st b{font-size:1.05rem}
+#interp p{color:var(--text);margin:0 0 8px}
+.hint{display:block;margin-top:8px;color:var(--muted)}
+.num{width:92px;padding:3px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--accent);font:inherit;font-weight:600;text-align:right}
+.ghost{background:var(--accent-soft);color:var(--accent);margin-top:4px}
+.panel,.card{box-shadow:0 0 18px rgba(0,229,255,.07)}
+.card:hover{box-shadow:0 0 24px rgba(0,229,255,.4)}
+h1{text-shadow:0 0 18px rgba(0,229,255,.5)}
+nav a.on,button:not(:disabled){box-shadow:0 0 14px rgba(0,229,255,.5)}
+.ghost{box-shadow:none!important;border:1px solid var(--border)}
+.tag{box-shadow:0 0 10px rgba(0,229,255,.3)}
+.formula{border:1px solid var(--border);text-shadow:0 0 8px rgba(0,229,255,.35)}
+.plot svg path[stroke]{filter:drop-shadow(0 0 4px rgba(0,229,255,.8))}
+.plot{height:260px;border:1px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);text-align:center;padding:12px;overflow:hidden}
+.plot svg{width:100%;height:100%}
+.back{display:inline-block;margin-bottom:12px;color:var(--accent);text-decoration:none;font-size:.9rem}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding-bottom:24px}
+</style>
+</head>
+<body>
+<header><div class="bar">
+<a class="brand" href="#home">📊 Distributions Lab</a>
+<nav id="nav"></nav>
+</div></header>
+<main id="app"></main>
+<footer>For undergraduate AI &amp; ML students · Change a slider and everything updates</footer>
+
+<script>
+const MODULES = {
+  normal: {
+    num: 1, nav: "Normal", title: "Normal Distribution",
+    sub: "Manufacturing Quality Control",
+    blurb: "Decide how many factory parts fall inside the allowed size range.",
+    problem: "A factory makes drive shafts that should be 10 mm in diameter. Because no machine is perfect, diameters vary a little, and most shafts land near the average. A shaft is accepted only if its diameter is between the lower limit (9.90 mm) and the upper limit (10.10 mm). What is the probability that a shaft is accepted, too thin, or too thick, and what percentage of the product is expected to be defective?",
+    params: [
+      ["Mean diameter μ (mm)", 10, 9.5, 10.5, 0.01],
+      ["Standard deviation σ (mm)", 0.05, 0.01, 0.2, 0.005],
+      ["Lower limit (mm)", 9.9, 9.5, 10.5, 0.01],
+      ["Upper limit (mm)", 10.1, 9.5, 10.5, 0.01]
+    ],
+    formula: "f(x) = 1 / (σ√(2π)) · e^( −(x − μ)² / (2σ²) )",
+    formulaNote: "To get a probability we find the area under this curve. Below the lower limit L: P(X < L) = Φ(z_L). Above the upper limit U: P(X > U) = 1 − Φ(z_U). Between them: Φ(z_U) − Φ(z_L). Φ(z) is the standard normal “area to the left of z”. We use z = (x − μ) / σ to compare any value with the average.",
+    calcTitle: "Calculate the acceptance rate",
+    calcBtn: "Calculate P(lower ≤ X ≤ upper)",
+    plot: "Bell curve with the accepted region shaded between the limits",
+    interp: "Here we will explain in plain words what the acceptance rate means, how many rods out of 1,000 are rejected, and how a smaller σ makes the process more reliable."
+  },
+  exponential: {
+    num: 2, nav: "Exponential", title: "Exponential Distribution",
+    sub: "Cloud Request Inter-arrival Time",
+    blurb: "Model the waiting time between requests reaching a server.",
+    problem: "A cloud server receives requests at random, on average a fixed number every second. The exponential distribution describes how long we wait between two requests. Engineers use it to size servers and to estimate the chance that a gap is shorter or longer than some time t.",
+    params: [
+      ["Arrival rate λ (requests/sec)", 5, 0.5, 20, 0.5],
+      ["Time t (sec)", 0.2, 0.01, 2, 0.01]
+    ],
+    formula: "f(t) = λ · e^(−λt)     P(T ≤ t) = 1 − e^(−λt)",
+    formulaNote: "The average waiting time is 1/λ. This distribution is “memoryless”: the time already waited does not change the chance of the next request arriving soon.",
+    calcTitle: "Calculate waiting-time probabilities",
+    calcBtn: "Calculate P(T ≤ t) and P(T > t)",
+    plot: "Decaying curve with the area up to t shaded",
+    interp: "Here we will explain what the probability means for server load, for example how often two requests arrive closer together than t seconds."
+  },
+  clt: {
+    num: 3, nav: "Central Limit Theorem", title: "Central Limit Theorem",
+    sub: "Warehouse Processing Time",
+    blurb: "See why averages of many random times look like a bell curve.",
+    problem: "A warehouse packs orders, and a single order can take very different amounts of time (many quick ones, a few very slow ones). Managers care about the average time of a batch of orders. The Central Limit Theorem says that batch averages become bell-shaped as the batch grows, even if single times are not.",
+    params: [
+      ["Mean time per order μ (min)", 6, 1, 20, 0.5],
+      ["Standard deviation σ (min)", 4, 0.5, 10, 0.5],
+      ["Batch size n (orders)", 30, 1, 200, 1],
+      ["Number of batches simulated", 1000, 100, 5000, 100]
+    ],
+    formula: "X̄ ≈ Normal( μ,  σ / √n )",
+    formulaNote: "The average of n orders is centred on μ, and its spread σ/√n (the standard error) shrinks as n grows. Larger batches give more predictable averages.",
+    calcTitle: "Simulate batch averages",
+    calcBtn: "Run simulation",
+    plot: "Histogram of batch averages with the normal curve on top",
+    interp: "Here we will explain how the histogram of averages gets narrower and more bell-shaped as n increases, and what this means for planning staff and deadlines."
+  }
+};
+
+const nav = document.getElementById("nav"), app = document.getElementById("app");
+nav.innerHTML = '<a href="#home" data-k="home">Home</a>' +
+  Object.entries(MODULES).map(([k, m]) => `<a href="#${k}" data-k="${k}">${m.nav}</a>`).join("");
+
+function home() {
+  return `<h1>Continuous Probability Distributions: Industry Applications</h1>
+  <p class="lead">Learn three important ideas from probability by solving real industry problems. Each module gives you a story, inputs you can change, the formula, a calculator, a chart and a plain-language explanation.</p>
+  <div class="grid">` + Object.entries(MODULES).map(([k, m]) =>
+    `<a class="card" href="#${k}"><span class="tag">Module ${m.num}</span><h2>${m.title}</h2><strong>${m.sub}</strong><p>${m.blurb}</p></a>`).join("") + `</div>
+  <div class="panel" style="margin-top:24px"><h2>How to use this app</h2>
+  <p>Pick a module, read the problem, move the sliders, then use the calculator to see what changes in the chart and the interpretation.</p></div>`;
+}
+
+function fmt(v, step) { return step < 1 ? Number(v).toFixed(String(step).split(".")[1].length) : v; }
+
+function module(k) {
+  const m = MODULES[k];
+  const fields = m.params.map(([label, v, min, max, step], i) =>
+    `<div class="field"><label for="p${i}">${label}<input type="number" class="num" id="v${i}" min="${min}" max="${max}" step="${step}" value="${fmt(v, step)}" aria-label="${label}"></label>
+     <input type="range" id="p${i}" min="${min}" max="${max}" step="${step}" value="${v}" data-i="${i}" data-step="${step}">
+     <small>Range: ${min} to ${max}</small></div>`).join("");
+  return `<a class="back" href="#home">← Back to home</a>
+  <span class="tag">Module ${m.num}</span><h1>${m.title}</h1><p class="lead"><strong>${m.sub}</strong></p>
+  <div class="layout">
+    <section class="panel wide"><h2>1. Industry problem</h2><p style="margin:0;color:var(--text)">${m.problem}</p></section>
+    <section class="panel"><h2>2. Input parameters</h2>${fields}<button id="reset" class="ghost">Reset to defaults</button></section>
+    <section class="panel"><h2>3. Mathematical formula</h2><div class="formula">${m.formula}</div><p>${m.formulaNote}</p></section>
+    <section class="panel"><h2>4. ${m.calcTitle}</h2>
+      <button id="go">${m.calcBtn}</button>
+      <small class="hint">Results also update automatically when you move a slider.</small>
+      <div class="result" id="res"></div></section>
+    <section class="panel"><h2>5. Visualization</h2><div class="plot" id="plot"></div></section>
+    <section class="panel wide"><h2>6. Interpretation of results</h2><div id="interp"></div></section>
+  </div>`;
+}
+
+const $ = id => document.getElementById(id);
+const val = i => +$("p" + i).value;
+const put = (id, h) => { $(id).innerHTML = h; };
+const erf = x => { const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x);
+  return s * (1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x)); };
+const Phi = z => 0.5 * (1 + erf(z / Math.SQRT2));
+const pct = p => (100 * p).toFixed(2) + "%";
+const f3 = x => (+x).toFixed(3);
+const stat = (l, v) => `<div class="st"><span>${l}</span><b>${v}</b></div>`;
+const P = t => `<p>${t}</p>`;
+
+function chart(o) {
+  const W = 600, H = 260, L = 36, R = 12, T = 14, B = 38, pw = W - L - R, ph = H - T - B, N = 160;
+  const xs = Array.from({ length: N + 1 }, (_, i) => o.x0 + (o.x1 - o.x0) * i / N);
+  let ym = Math.max(...xs.map(o.fn)); (o.bars || []).forEach(b => ym = Math.max(ym, b.h)); ym *= 1.12;
+  const X = x => (L + (x - o.x0) / (o.x1 - o.x0) * pw).toFixed(1), Y = y => (T + ph - y / ym * ph).toFixed(1);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.label}">`;
+  (o.bars || []).forEach(b => { s += `<rect x="${X(b.x0)}" y="${Y(b.h)}" width="${Math.max(X(b.x1) - X(b.x0) - 1, 0.5)}" height="${T + ph - Y(b.h)}" fill="var(--accent)" opacity=".35"/>`; });
+  (o.shades || (o.shade ? [[o.shade[0], o.shade[1], "var(--accent)"]] : [])).forEach(([a0, b0, col]) => { const a = Math.max(a0, o.x0), b = Math.min(b0, o.x1);
+    if (b > a) { const pts = [a, ...xs.filter(x => x > a && x < b), b];
+      s += `<path d="M${X(a)} ${Y(0)}` + pts.map(x => `L${X(x)} ${Y(o.fn(x))}`).join("") + `L${X(b)} ${Y(0)}Z" fill="${col}" opacity=".5"/>`; } });
+  s += `<path d="` + xs.map((x, i) => (i ? "L" : "M") + X(x) + " " + Y(o.fn(x))).join("") + `" fill="none" stroke="var(--accent)" stroke-width="2.5"/>`;
+  s += `<line x1="${L}" y1="${T + ph}" x2="${W - R}" y2="${T + ph}" stroke="var(--muted)"/>`;
+  for (let i = 0; i <= 4; i++) { const v = o.x0 + (o.x1 - o.x0) * i / 4;
+    s += `<text x="${X(v)}" y="${T + ph + 15}" text-anchor="middle" font-size="11" fill="var(--muted)">${+v.toPrecision(3)}</text>`; }
+  (o.marks || []).forEach(([x, l]) => { if (x < o.x0 || x > o.x1) return;
+    s += `<line x1="${X(x)}" y1="${T + 14}" x2="${X(x)}" y2="${T + ph}" stroke="var(--text)" stroke-dasharray="4 3" opacity=".6"/><text x="${X(x)}" y="${T + 10}" text-anchor="middle" font-size="11" fill="var(--text)">${l}</text>`; });
+  s += `<text x="${L + pw / 2}" y="${H - 6}" text-anchor="middle" font-size="12" fill="var(--muted)">${o.xlabel}</text>`;
+  s += `<text transform="rotate(-90 11 ${T + ph / 2})" x="11" y="${T + ph / 2}" text-anchor="middle" font-size="11" fill="var(--muted)">Density</text></svg>`;
+  return s;
+}
+
+const U = {
+  normal() {
+    const mu = val(0), sd = val(1); let lo = val(2), hi = val(3); if (lo > hi) [lo, hi] = [hi, lo];
+    const zl = (lo - mu) / sd, zh = (hi - mu) / sd, below = Phi(zl), above = 1 - Phi(zh), p = Phi(zh) - below;
+    put("res", stat("Accepted", pct(p)) + stat("Rejected", pct(1 - p)) + stat("Rejected per 1,000", Math.round((1 - p) * 1000)) + stat("z-scores", f3(zl) + " to " + f3(zh)));
+    put("plot", chart({ x0: mu - 4 * sd, x1: mu + 4 * sd, fn: x => Math.exp(-((x - mu) ** 2) / (2 * sd * sd)) / (sd * Math.sqrt(2 * Math.PI)),
+      shade: [lo, hi], marks: [[lo, "lower"], [hi, "upper"], [mu, "μ"]], xlabel: "Rod length (mm)", label: "Normal curve with accepted region shaded" }));
+    const off = Math.abs(mu - (lo + hi) / 2), half = (hi - lo) / 2 / sd;
+    put("interp", P(`About <b>${pct(p)}</b> of rods fall between ${f3(lo)} mm and ${f3(hi)} mm, so roughly <b>${Math.round((1 - p) * 1000)} out of every 1,000</b> are rejected (${(below * 1000).toFixed(0)} too short, ${(above * 1000).toFixed(0)} too long).`) +
+      P(`The limits sit about ${half.toFixed(2)} standard deviations either side of the middle. ` + (p > 0.9973 ? "That is an excellent process: almost nothing is wasted." : p > 0.95 ? "That is decent, but a smaller σ would cut waste further." : "That is a lot of scrap. Reduce σ (a steadier machine) or check the limits.")) +
+      (off > 0.1 * (hi - lo) ? P(`The machine average is ${f3(off)} mm away from the centre of the limits. Re-centring it would raise the acceptance rate.`) : ""));
+  },
+  exponential() {
+    const lam = val(0), t = val(1), p = 1 - Math.exp(-lam * t);
+    put("res", stat("P(T ≤ t)", pct(p)) + stat("P(T > t)", pct(1 - p)) + stat("Average gap 1/λ", f3(1 / lam) + " s") + stat("Median gap", f3(Math.LN2 / lam) + " s"));
+    put("plot", chart({ x0: 0, x1: Math.max(5 / lam, t * 1.3), fn: x => lam * Math.exp(-lam * x), shade: [0, t], marks: [[t, "t"], [1 / lam, "mean"]],
+      xlabel: "Time between requests (sec)", label: "Exponential curve with area up to t shaded" }));
+    put("interp", P(`The next request arrives within <b>${f3(t)} s</b> with probability <b>${pct(p)}</b>. A gap longer than ${f3(t)} s happens ${pct(1 - p)} of the time.`) +
+      P(`With ${lam} requests per second, the average gap is ${f3(1 / lam)} s (about ${(60 * lam).toFixed(0)} requests per minute). Notice the median gap (${f3(Math.LN2 / lam)} s) is shorter than the mean: about 63% of gaps are shorter than average, because there are many short gaps and a few long ones.`) +
+      P("Short gaps mean bursts of traffic, which is what autoscaling and queues must handle."));
+  },
+  clt() {
+    const mu = val(0), sd = val(1), n = val(2), B = val(3);
+    const s2 = Math.log(1 + sd * sd / (mu * mu)), m = Math.log(mu) - s2 / 2, s = Math.sqrt(s2);
+    const gauss = () => Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
+    const avgs = [];
+    for (let b = 0; b < B; b++) { let sum = 0; for (let i = 0; i < n; i++) sum += Math.exp(m + s * gauss()); avgs.push(sum / n); }
+    const mean = avgs.reduce((a, b) => a + b, 0) / B, se = sd / Math.sqrt(n);
+    const sdv = Math.sqrt(avgs.reduce((a, b) => a + (b - mean) ** 2, 0) / (B - 1));
+    const x0 = Math.max(0, mu - 4 * se), x1 = mu + 4 * se, K = 30, w = (x1 - x0) / K, cnt = Array(K).fill(0);
+    avgs.forEach(a => { const j = Math.floor((a - x0) / w); if (j >= 0 && j < K) cnt[j]++; });
+    const bars = cnt.map((c, j) => ({ x0: x0 + j * w, x1: x0 + (j + 1) * w, h: c / (B * w) }));
+    put("res", stat("Mean of averages", f3(mean) + " min") + stat("Spread of averages", f3(sdv)) + stat("Theory σ/√n", f3(se)) + stat("Batch size n", n));
+    put("plot", chart({ x0, x1, bars, fn: x => Math.exp(-((x - mu) ** 2) / (2 * se * se)) / (se * Math.sqrt(2 * Math.PI)), marks: [[mu, "μ"]],
+      xlabel: "Average processing time of a batch (min)", label: "Histogram of batch averages with normal curve" }));
+    put("interp", P(`Single orders are very uneven (we simulated a right-skewed population: mostly quick, a few very slow, with σ = ${sd} min). But the average of ${n} orders has a spread of only <b>${f3(sdv)}</b> min, close to the theory value σ/√n = ${f3(se)}. Larger batches are ${Math.sqrt(n).toFixed(1)} times steadier.`) +
+      P(n < 10 ? "With a small n the histogram is still lopsided. Try increasing n." : n < 30 ? "The histogram is already close to a bell shape." : "The histogram follows the normal curve closely: this is the Central Limit Theorem at work.") +
+      P(`About 95% of batch averages should land between ${f3(Math.max(0, mu - 1.96 * se))} and ${f3(mu + 1.96 * se)} minutes, which helps in planning staff and deadlines. Press Run again for a fresh random sample.`));
+  }
+};
+const update = k => { if (U[k]) U[k](); };
+app.addEventListener("click", e => {
+  const k = location.hash.slice(1);
+  if (e.target.id === "go") update(k);
+  if (e.target.id === "reset") { MODULES[k].params.forEach(([l, v, mn, mx, st], i) => { $("p" + i).value = v; $("v" + i).value = fmt(v, st); }); update(k); }
+});
+app.addEventListener("change", e => { const t = e.target; if (t.classList.contains("num")) t.value = fmt($("p" + t.id.slice(1)).value, +$("p" + t.id.slice(1)).step); });
+
+U.normal = () => {
+  const mu = val(0), sd = val(1); let lo = val(2), hi = val(3); const swapped = lo > hi; if (swapped) [lo, hi] = [hi, lo];
+  const zl = (lo - mu) / sd, zh = (hi - mu) / sd, below = Phi(zl), above = 1 - Phi(zh), within = Phi(zh) - below, defect = below + above;
+  const G = "#2f9e44", R = "#e03131", card = (l, v, c) => `<div class="st" style="border-left:4px solid ${c}"><span>${l}</span><b>${v}</b></div>`;
+  put("res", card("P(lower ≤ X ≤ upper)", pct(within), G) + card("P(X < lower)", pct(below), R) + card("P(X > upper)", pct(above), R) + card("Expected defective", pct(defect), R) + stat("Defective per 1,000", (defect * 1000).toFixed(1)) + stat("z-scores", f3(zl) + " to " + f3(zh)));
+  const svg = chart({ x0: Math.min(mu - 4 * sd, lo - sd), x1: Math.max(mu + 4 * sd, hi + sd), fn: x => Math.exp(-((x - mu) ** 2) / (2 * sd * sd)) / (sd * Math.sqrt(2 * Math.PI)),
+    shades: [[-1e9, lo, R], [lo, hi, G], [hi, 1e9, R]], marks: [[lo, "lower"], [hi, "upper"], [mu, "μ"]], xlabel: "Shaft diameter (mm)", label: "Normal curve: green is accepted, red is defective" });
+  put("plot", svg.replace("</svg>", `<rect x="470" y="22" width="10" height="10" fill="${G}" opacity=".6"/><text x="486" y="31" font-size="11" fill="var(--text)">Accepted</text><rect x="470" y="38" width="10" height="10" fill="${R}" opacity=".6"/><text x="486" y="47" font-size="11" fill="var(--text)">Defective</text></svg>`));
+  const cp = (hi - lo) / (6 * sd), off = Math.abs(mu - (lo + hi) / 2);
+  put("interp", P(`Of every 1,000 shafts, about <b>${Math.round(within * 1000)}</b> are accepted (diameter between ${lo.toFixed(2)} and ${hi.toFixed(2)} mm) and about <b>${(defect * 1000).toFixed(0)}</b> are defective: ${(below * 1000).toFixed(0)} too thin and ${(above * 1000).toFixed(0)} too thick.`) +
+    P(`Expected defect percentage = P(X < lower) + P(X > upper) = ${pct(below)} + ${pct(above)} = <b>${pct(defect)}</b>.`) +
+    P(`Process capability Cp = (upper − lower) / 6σ = ${f3(cp)}. ` + (cp >= 1.33 ? "A Cp of 1.33 or more is usually considered capable." : "A Cp below 1.33 means the spread is wide for these limits. Reduce σ to improve it.")) +
+    (off > 0.1 * (hi - lo) ? P(`The mean is ${f3(off)} mm away from the middle of the limits, so one side produces more defects. Re-centring the machine would help.`) : "") +
+    (swapped ? P("Note: the lower limit was above the upper limit, so we swapped them.") : ""));
+};
+
+function route() {
+  const k = location.hash.slice(1);
+  app.innerHTML = MODULES[k] ? module(k) : home();
+  nav.querySelectorAll("a").forEach(a => a.classList.toggle("on", a.dataset.k === (MODULES[k] ? k : "home")));
+  window.scrollTo(0, 0);
+  if (MODULES[k]) update(k);
+}
+app.addEventListener("input", e => {
+  const t = e.target;
+  if (t.matches("input[type=range]")) { document.getElementById("v" + t.dataset.i).value = fmt(t.value, +t.dataset.step); update(location.hash.slice(1)); }
+  else if (t.classList.contains("num") && t.value !== "" && !isNaN(+t.value)) { document.getElementById("p" + t.id.slice(1)).value = t.value; update(location.hash.slice(1)); }
+});
+addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
